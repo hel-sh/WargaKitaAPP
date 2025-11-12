@@ -1,11 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:warga_kita_app/provider/user_provider.dart';
 import '../style/colors/wargakita_colors.dart';
 
 Future<void> performLogout(BuildContext context) async {
   if (!context.mounted) return;
 
   try {
+    await Provider.of<UserProvider>(context, listen: false).logout();
     await FirebaseAuth.instance.signOut();
 
     if (context.mounted) {

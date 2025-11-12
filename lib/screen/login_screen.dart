@@ -47,14 +47,14 @@ class _LoginScreenState extends State<LoginScreen> {
   void _onLogin() async {
     if (_formKey.currentState!.validate()) {
       try {
-        await FirebaseAuth.instance.signInWithEmailAndPassword(
+        final userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: _emailController.text,
           password: _passwordController.text,
         );
 
         if (!mounted) return;
 
-        await Provider.of<UserProvider>(context, listen: false).refreshUserData();
+        await Provider.of<UserProvider>(context, listen: false).setLoggedInUser(userCredential.user!);
 
         _showSuccessSnackbar("Login Berhasil! Selamat datang di Komunitas.");
 

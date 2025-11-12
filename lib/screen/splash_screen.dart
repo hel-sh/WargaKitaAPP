@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:warga_kita_app/provider/user_provider.dart';
 import 'package:warga_kita_app/style/colors/wargakita_colors.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -12,10 +14,23 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(seconds: 3), () {
-      if (!mounted) return;
+    _checkLoginStatus();
+  }
+
+  void _checkLoginStatus() async {
+    await Future.delayed(const Duration(seconds: 2));
+
+    if (!mounted) return;
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final isLoggedIn = await userProvider.checkAuthenticationStatus();
+
+    if (!mounted) return;
+
+    if (isLoggedIn) {
+      Navigator.pushReplacementNamed(context, '/home');
+    } else {
       Navigator.pushReplacementNamed(context, '/start');
-    });
+    }
   }
 
   @override
