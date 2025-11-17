@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:warga_kita_app/service/local_storage_service.dart';
 import '../service/user_service.dart';
 import '../service/user_record_service.dart';
 
@@ -30,26 +31,43 @@ class UserData {
 class UserProvider extends ChangeNotifier {
   final UserService _userService = UserService();
   final UserActivityService _activityService = UserActivityService();
-  StreamSubscription<User?>? _authStateSubscription;
+  final LocalStorageService _localStorageService = LocalStorageService();
 
   String _currentUid = '';
   UserData _userData = UserData.initial;
-  bool _isLoading = true;
+  bool _isLoading = false;
 
   UserData get userData => _userData;
   bool get isLoading => _isLoading;
   String get currentUid => _currentUid;
 
-  UserProvider() {
-    _authStateSubscription = FirebaseAuth.instance.authStateChanges().listen((user) {
-      if (user != null) {
-        _currentUid = user.uid;
-        _loadUserData();
-      } else {
-        _currentUid = '';
-        _resetUserData();
-      }
-    });
+  UserProvider();
+
+  Future<bool> checkAuthenticationStatus() async {
+    final firebaseUser = FirebaseAuth.instance.currentUser;
+    final localUid = await _localStorageService.getUid();
+
+    if (firebaseUser != null && localUid != null && firebaseUser.uid == localUid) {
+      _currentUid = firebaseUser.uid;
+      await _loadUserData();
+      return true;
+    }
+
+    _currentUid = '';
+    _resetUserData();
+    return false;
+  }
+
+  Future<void> setLoggedInUser(User user) async {
+    _currentUid = user.uid;
+    await _localStorageService.saveUid(user.uid);
+    await _loadUserData();
+  }
+
+  Future<void> logout() async {
+    await _localStorageService.deleteUid();
+    _currentUid = '';
+    _resetUserData();
   }
 
   void _resetUserData() {
@@ -102,11 +120,6 @@ class UserProvider extends ChangeNotifier {
     await _loadUserData();
   }
 
-  @override
-  void dispose() {
-    _authStateSubscription?.cancel();
-    super.dispose();
-  }
 }
 
 extension on UserData {
