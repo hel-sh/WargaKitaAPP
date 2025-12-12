@@ -66,10 +66,8 @@ Setiap pengguna memiliki profil sederhana berisi nama, dan kontak, untuk membang
 ## ⚙️ Cara Menjalankan Aplikasi
 
 ```bash
-git clone https://github.com/NaufalFadhiil/WargaKitaApp.git
-cd WargaKitaApp
-flutter pub get
-flutter run
+https://drive.google.com/drive/folders/1HbCRjYP_yOxrZmuRB7yIXV-xp8mDiYVD
+Link Google Drive berisi file WargaKitaApp.apk
 ```
 ---
 
